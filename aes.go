@@ -19,38 +19,35 @@ import (
 
 var GcmNonce = []byte("Jl8aXipNicI8")
 
-func AESGCMEncryptBinBytes(data []byte, passwd string) (ret []byte) {
+func AESGCMEncryptBinBytes(data []byte, passwd string) (ret []byte, err error) {
 	key := keyHash(passwd)
 	block, err := aes.NewCipher([]byte(key))
 	if nil != err {
-		return nil
+		return
 	}
 
 	aesgcm, err := cipher.NewGCM(block)
 	if nil != err {
-		return nil
+		return
 	}
 
 	ret = aesgcm.Seal(nil, GcmNonce, data, nil)
 	return
 }
 
-func AESGCMDecryptBinBytes(cryptData []byte, passwd string) (ret []byte) {
+func AESGCMDecryptBinBytes(cryptData []byte, passwd string) (ret []byte, err error) {
 	key := keyHash(passwd)
 	block, err := aes.NewCipher([]byte(key))
 	if nil != err {
-		return nil
+		return
 	}
 
 	aesgcm, err := cipher.NewGCM(block)
 	if nil != err {
-		return nil
+		return
 	}
 
 	ret, err = aesgcm.Open(nil, GcmNonce, cryptData, nil)
-	if nil != err {
-		return nil
-	}
 	return
 }
 
