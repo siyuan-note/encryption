@@ -11,44 +11,26 @@
 package encryption
 
 import (
-	"crypto/aes"
-	"crypto/cipher"
+	"crypto/rand"
+
+	"golang.org/x/crypto/scrypt"
 )
 
-func AesEncrypt(data, key []byte) (ret []byte, err error) {
-	block, err := aes.NewCipher(key)
+func KDF(password string) (key []byte, err error) {
+	salt, err := getRandomData(64)
 	if nil != err {
 		return
 	}
 
-	aesgcm, err := cipher.NewGCM(block)
+	key, err = scrypt.Key([]byte(password), salt, 32768, 8, 1, 32)
 	if nil != err {
 		return
 	}
-
-	nonce, err := getRandomData(12)
-	if nil != err {
-		return
-	}
-
-	data = aesgcm.Seal(nil, nonce, data, nil)
-	ret = append(nonce, data...)
 	return
 }
 
-func AesDecrypt(cryptData, key []byte) (ret []byte, err error) {
-	block, err := aes.NewCipher(key)
-	if nil != err {
-		return
-	}
-
-	aesgcm, err := cipher.NewGCM(block)
-	if nil != err {
-		return
-	}
-
-	nonce := cryptData[:12]
-	ret = cryptData[12:]
-	ret, err = aesgcm.Open(nil, nonce, ret, nil)
+func getRandomData(size int) (ret []byte, err error) {
+	ret = make([]byte, size)
+	_, err = rand.Read(ret)
 	return
 }

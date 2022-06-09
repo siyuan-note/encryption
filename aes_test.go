@@ -11,44 +11,28 @@
 package encryption
 
 import (
-	"crypto/aes"
-	"crypto/cipher"
+	"testing"
 )
 
-func AesEncrypt(data, key []byte) (ret []byte, err error) {
-	block, err := aes.NewCipher(key)
+func TestAes(t *testing.T) {
+	const password = "123"
+
+	key, err := KDF(password)
 	if nil != err {
+		t.Error(err)
 		return
 	}
-
-	aesgcm, err := cipher.NewGCM(block)
+	encrypt, err := AesEncrypt([]byte("Hello!"), key)
 	if nil != err {
+		t.Error(err)
 		return
 	}
+	t.Logf("encrypt len [%d]", len(encrypt))
 
-	nonce, err := getRandomData(12)
+	decrypt, err := AesDecrypt(encrypt, key)
 	if nil != err {
+		t.Error(err)
 		return
 	}
-
-	data = aesgcm.Seal(nil, nonce, data, nil)
-	ret = append(nonce, data...)
-	return
-}
-
-func AesDecrypt(cryptData, key []byte) (ret []byte, err error) {
-	block, err := aes.NewCipher(key)
-	if nil != err {
-		return
-	}
-
-	aesgcm, err := cipher.NewGCM(block)
-	if nil != err {
-		return
-	}
-
-	nonce := cryptData[:12]
-	ret = cryptData[12:]
-	ret, err = aesgcm.Open(nil, nonce, ret, nil)
-	return
+	t.Log(string(decrypt))
 }
