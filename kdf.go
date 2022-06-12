@@ -16,13 +16,8 @@ import (
 	"golang.org/x/crypto/scrypt"
 )
 
-func KDF(password string) (key []byte, err error) {
-	salt, err := getRandomData(64)
-	if nil != err {
-		return
-	}
-
-	key, err = scrypt.Key([]byte(password), salt, 32768, 8, 1, 32)
+func KDF(password, salt string) (key []byte, err error) {
+	key, err = scrypt.Key([]byte(password), []byte(salt), 32768, 8, 1, 32)
 	if nil != err {
 		return
 	}

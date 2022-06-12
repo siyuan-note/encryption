@@ -11,13 +11,17 @@
 package encryption
 
 import (
+	"bytes"
 	"testing"
 )
 
 func TestAes(t *testing.T) {
-	const password = "123"
+	const (
+		password = "123"
+		salt     = "456"
+	)
 
-	key, err := KDF(password)
+	key, err := KDF(password, salt)
 	if nil != err {
 		t.Error(err)
 		return
@@ -35,4 +39,25 @@ func TestAes(t *testing.T) {
 		return
 	}
 	t.Log(string(decrypt))
+
+	key2, err := KDF(password, salt)
+	if nil != err {
+		t.Error(err)
+		return
+	}
+
+	if 0 != bytes.Compare(key, key2) {
+		t.Error("key not equal")
+		return
+	}
+
+	decrypt2, err := AesDecrypt(encrypt, key2)
+	if nil != err {
+		t.Error(err)
+		return
+	}
+	if 0 != bytes.Compare(decrypt, decrypt2) {
+		t.Error("decrypt not equal")
+		return
+	}
 }

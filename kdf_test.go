@@ -13,7 +13,7 @@ package encryption
 import "testing"
 
 func TestKDF(t *testing.T) {
-	kdf, err := KDF("123")
+	kdf, err := KDF("password123", "salt123")
 	if nil != err {
 		t.Error(err)
 		return
