@@ -10,7 +10,10 @@
 
 package encryption
 
-import "testing"
+import (
+	"encoding/hex"
+	"testing"
+)
 
 func TestKDF(t *testing.T) {
 	kdf, err := KDF("password123", "salt123")
@@ -18,5 +21,8 @@ func TestKDF(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	t.Log(kdf)
+	if "714047d3f647c8a0f27aa435052d6971981cc8cc7687df28af329df55c98da80" != hex.EncodeToString(kdf) {
+		t.Error("invalid key")
+		return
+	}
 }
